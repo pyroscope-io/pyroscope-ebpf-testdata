@@ -1,7 +1,8 @@
 ARG PYTHON_VERSION=3.9
 FROM python:${PYTHON_VERSION}
 
-RUN pip3 install flask
+ADD requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
 ENV FLASK_ENV=development
 ENV PYTHONUNBUFFERED=1
