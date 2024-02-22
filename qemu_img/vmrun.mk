@@ -1,14 +1,16 @@
 
 QEMU_ARCH ?= amd64
-KVM_ARGS ?= -enable-kvm -cpu host
+
 ifeq ($(QEMU_ARCH),amd64)
 QEMU_BIN ?= qemu-system-x86_64 -M pc   -append "root=/dev/vda console=ttyS0  noresume"
+KVM_ARGS ?= -enable-kvm -cpu host
 KERNEL_NAME ?= 6.1.0-18-amd64
 KERNEL ?= amd64/boot/vmlinuz-$(KERNEL_NAME)
 INITRD ?= amd64/boot/initrd.img-$(KERNEL_NAME)
 DISK ?= amd64/disk.ext4
 else ifeq ($(QEMU_ARCH),arm64)
-QEMU_BIN=qemu-system-aarch64 -M virt -cpu cortex-a57  -append "root=/dev/vda2 console=ttyAMA0 noresume"
+QEMU_BIN=qemu-system-aarch64 -M virt -cpu cortex-a57  -append "root=/dev/vda console=ttyAMA0 noresume"
+KVM_ARGS ?=
 KERNEL_NAME ?= 6.1.0-18-arm64
 KERNEL ?= arm64/boot/vmlinuz-$(KERNEL_NAME)
 INITRD ?= arm64/boot/initrd.img-$(KERNEL_NAME)
@@ -24,7 +26,7 @@ qemu/kill:
 	pkill qemu-system || true
 
 .PHONY: qemu/start
-qemu/start: # todo add dependencies
+qemu/start:
 	  $(QEMU_BIN) $(KVM_ARGS) \
         -smp 4  \
         -m 4G \
@@ -35,8 +37,7 @@ qemu/start: # todo add dependencies
         -net nic \
         -device intel-hda \
         -device hda-duplex \
-        -nographic \
-         &
+        -nographic
 
 
 SSH_CMD=ssh -p 2222 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@localhost
