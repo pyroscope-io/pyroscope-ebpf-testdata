@@ -35,8 +35,6 @@ qemu/start:
         -drive if=virtio,file=${DISK},format=raw,id=hd \
         -net user,hostfwd=tcp::2222-:22 \
         -net nic \
-        -device intel-hda \
-        -device hda-duplex \
         -nographic
 
 
