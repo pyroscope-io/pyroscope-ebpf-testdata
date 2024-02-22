@@ -75,7 +75,8 @@ systemctl enable docker.service
 #update-alternatives --set iptables /usr/sbin/iptables-legacy
 #update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 #unlink /usr/sbin/iptables -> /tmp/tmp.SWY7A6UJT4/etc/alternatives/iptables # this is probably some farkechroot/chroot issue
-unlink /usr/sbin/iptables
-ln -s /usr/sbin/iptables-legacy /usr/sbin/iptables
-unlink /usr/sbin/ip6tables
-ln -s /usr/sbin/ip6tables-legacy /usr/sbin/ip6tables
+#unlink /usr/sbin/iptables
+#ln -s /usr/sbin/iptables-legacy /usr/sbin/iptables
+#unlink /usr/sbin/ip6tables
+#ln -s /usr/sbin/ip6tables-legacy /usr/sbin/ip6tables
+#ls -l /usr/sbin/*tables

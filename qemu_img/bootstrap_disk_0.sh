@@ -18,6 +18,8 @@ cp /bootstrap_disk_1.sh  "$TMP/"
 fakechroot chroot "$TMP" bash /bootstrap_disk_1.sh
 
 
+chroot "$TMP" update-alternatives --set iptables /usr/sbin/iptables-legacy
+chroot "$TMP" update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
 
 rsync  -a "${MODULES}/" "$TMP/usr/lib/modules"

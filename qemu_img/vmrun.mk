@@ -3,14 +3,16 @@ QEMU_ARCH ?= amd64
 KVM_ARGS ?= -enable-kvm -cpu host
 ifeq ($(QEMU_ARCH),amd64)
 QEMU_BIN ?= qemu-system-x86_64 -M pc   -append "root=/dev/vda console=ttyS0  noresume"
-KERNEL ?= amd64/boot/vmlinuz-6.1.0-18-amd64
-INITRD ?= amd64/boot/initrd.img-6.1.0-18-amd64
+KERNEL_NAME ?= 6.1.0-18-amd64
+KERNEL ?= amd64/boot/vmlinuz-$(KERNEL_NAME)
+INITRD ?= amd64/boot/initrd.img-$(KERNEL_NAME)
 DISK ?= amd64/disk.ext4
 else ifeq ($(QEMU_ARCH),arm64)
 QEMU_BIN=qemu-system-aarch64 -M virt -cpu cortex-a57  -append "root=/dev/vda2 console=ttyAMA0 noresume"
-#INITRD=$(TMP_EBPF)/initrd.img-5.10.0-26-arm64
-#KERNEL=$(TMP_EBPF)/vmlinuz-5.10.0-26-arm64
-#DISK=$(TMP_EBPF)/debian-5.10-aarch64.qcow2
+KERNEL_NAME ?= 6.1.0-18-arm64
+KERNEL ?= arm64/boot/vmlinuz-$(KERNEL_NAME)
+INITRD ?= arm64/boot/initrd.img-$(KERNEL_NAME)
+DISK ?= arm64/disk.ext4
 else
 $(error "Unknown QEMU_ARCH: $(QEMU_ARCH)")
 endif
@@ -37,7 +39,7 @@ qemu/start: # todo add dependencies
          &
 
 
-SSH_CMD="ssh -p 2222 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@localhost"
+SSH_CMD=ssh -p 2222 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@localhost
 #
 #wait_for_ssh() {
 #  local retries=0
@@ -57,3 +59,7 @@ qemu/wait:
 	@echo "Waiting for SSH to be available"
 	@${SSH_CMD} true
 	@echo "SSH is available"
+
+.PHONY: qemu/ssh
+qemu/ssh:
+	$(SSH_CMD)
