@@ -10,7 +10,6 @@ amd64/kernels:
 arm64/kernels:
 	docker build --platform=linux/arm64 --target=kernels --output=arm64/ -f arm64.Dockerfile .
 
-.PHONY: amd64/disk.ext4
 amd64/disk.ext4: amd64/kernels
 	rm -f $@ && fallocate -l 8G $@ && mkfs.ext4 $@
 	docker build --platform=linux/amd64 --target=image_builder --tag=vm_image_builder -f amd64.Dockerfile .
@@ -18,7 +17,6 @@ amd64/disk.ext4: amd64/kernels
 	docker run --platform=linux/amd64 --rm -ti -u 0 --privileged -v $(shell pwd):/mnt/ vm_image_builder \
 		/bootstrap_disk_0.sh /mnt/$@ /mnt/amd64/modules
 
-.PHONY: arm64/disk.ext4
 arm64/disk.ext4: arm64/kernels
 	rm -f $@ && fallocate -l 8G $@ && mkfs.ext4 $@
 	docker build --platform=linux/arm64 --target=image_builder --tag=vm_image_builder -f arm64.Dockerfile .
@@ -27,13 +25,13 @@ arm64/disk.ext4: arm64/kernels
 		/bootstrap_disk_0.sh /mnt/$@ /mnt/arm64/modules
 
 
-.PHONY: docker/push
-docker/push: # amd64/disk.ext4 arm64/disk.ext4 # commented to avoid building the images
-	# todo add push arg
-	docker build --target=pusher -t $(DIST_IMAGE) -f dist.Dockerfile .
+.PHONY: dist/push
+#dist/push: amd64/disk.ext4 arm64/disk.ext4 # TODO
+dist/push:
+	docker build --push --target=pusher -t $(DIST_IMAGE) -f dist.Dockerfile .
 
-.PHONY: docker/pull
-docker/pull:
+.PHONY: dist/pull
+dist/pull:
 	docker pull $(DIST_IMAGE)
 	docker build --target=puller -f dist.Dockerfile --output=. .
 
