@@ -33,3 +33,7 @@ export INITRD=amd64/boot_extra/initramfs-5.10.205-195.807.amzn2.x86_64.img
 make qemu/start
 
 
+To rebuild docker image, do
+make amd64/disk.ext4
+make arm64/disk.ext4
+make dist/

@@ -1,4 +1,7 @@
 
+DIST_IMAGE ?= pyroscope/ebpf-test-vm-image:latest
+
+
 .PHONY: amd64/kernels
 amd64/kernels:
 	docker build --platform=linux/amd64 --target=kernels --output=amd64/ -f amd64.Dockerfile .
@@ -17,10 +20,25 @@ amd64/disk.ext4: amd64/kernels
 
 .PHONY: arm64/disk.ext4
 arm64/disk.ext4: arm64/kernels
-	#rm -f $@ && fallocate -l 8G $@ && mkfs.ext4 $@
+	rm -f $@ && fallocate -l 8G $@ && mkfs.ext4 $@
 	docker build --platform=linux/arm64 --target=image_builder --tag=vm_image_builder -f arm64.Dockerfile .
 	# I failed to build a docker image using genext2fs, so I'm using a docker container to build the image using docker run --privileged
 	docker run --platform=linux/arm64 --rm -ti -u 0 --privileged -v $(shell pwd):/mnt/ vm_image_builder \
 		/bootstrap_disk_0.sh /mnt/$@ /mnt/arm64/modules
+
+
+.PHONY: docker/push
+docker/push: # amd64/disk.ext4 arm64/disk.ext4 # commented to avoid building the images
+	# todo add push arg
+	docker build --target=pusher -t $(DIST_IMAGE) -f dist.Dockerfile .
+
+.PHONY: docker/pull
+docker/pull:
+	#docker pull $(DIST_IMAGE)
+	docker build --target=puller -f dist.Dockerfile --output=. .
+
+.PHONY: clean
+clean:
+	rm -rf amd64/*ext4 arm64/*ext4 amd64/modules/* arm64/modules/* amd64/boot/* arm64/boot/*
 
 include vmrun.mk
