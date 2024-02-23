@@ -1,5 +1,6 @@
 
-DIST_IMAGE ?= pyroscope/ebpf-test-vm-image:latest
+#DIST_IMAGE ?= pyroscope/ebpf-test-vm-image:latest
+DIST_IMAGE ?= pyroscope/ebpf-test-vm-image:dev-1
 
 
 .PHONY: amd64/kernels
@@ -10,6 +11,7 @@ amd64/kernels:
 arm64/kernels:
 	docker build --platform=linux/arm64 --target=kernels --output=arm64/ -f arm64.Dockerfile .
 
+.PHONY: amd64/disk.ext4
 amd64/disk.ext4: amd64/kernels
 	rm -f $@ && fallocate -l 8G $@ && mkfs.ext4 $@
 	docker build --platform=linux/amd64 --target=image_builder --tag=vm_image_builder -f amd64.Dockerfile .
@@ -17,6 +19,7 @@ amd64/disk.ext4: amd64/kernels
 	docker run --platform=linux/amd64 --rm -ti -u 0 --privileged -v $(shell pwd):/mnt/ vm_image_builder \
 		/bootstrap_disk_0.sh /mnt/$@ /mnt/amd64/modules
 
+.PHONY: amd64/disk.ext4
 arm64/disk.ext4: arm64/kernels
 	rm -f $@ && fallocate -l 8G $@ && mkfs.ext4 $@
 	docker build --platform=linux/arm64 --target=image_builder --tag=vm_image_builder -f arm64.Dockerfile .
@@ -26,14 +29,13 @@ arm64/disk.ext4: arm64/kernels
 
 
 .PHONY: dist/push
-#dist/push: amd64/disk.ext4 arm64/disk.ext4 # TODO
-dist/push:
-	docker build --push --target=pusher -t $(DIST_IMAGE) -f dist.Dockerfile .
+dist/push: amd64/disk.ext4 arm64/disk.ext4
+	docker build --build-arg=IMAGE=$(DIST_IMAGE) --target=push --push -t $(DIST_IMAGE) -f dist.Dockerfile .
 
 .PHONY: dist/pull
 dist/pull:
 	docker pull $(DIST_IMAGE)
-	docker build --target=puller -f dist.Dockerfile --output=. .
+	docker build --build-arg=IMAGE=$(DIST_IMAGE) --target=pull -f dist.Dockerfile --output=./test .
 
 .PHONY: clean
 clean:
