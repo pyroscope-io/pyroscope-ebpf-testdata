@@ -34,7 +34,7 @@ docker/push: # amd64/disk.ext4 arm64/disk.ext4 # commented to avoid building the
 
 .PHONY: docker/pull
 docker/pull:
-	#docker pull $(DIST_IMAGE)
+	docker pull $(DIST_IMAGE)
 	docker build --target=puller -f dist.Dockerfile --output=. .
 
 .PHONY: clean
