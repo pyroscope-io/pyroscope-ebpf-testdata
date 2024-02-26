@@ -1,14 +1,14 @@
 
-QEMU_ARCH ?= amd64
+ARCH ?= amd64
 
-ifeq ($(QEMU_ARCH),amd64)
+ifeq ($(ARCH),amd64)
 QEMU_BIN ?= qemu-system-x86_64 -M pc   -append "root=/dev/vda console=ttyS0  noresume"
 KVM_ARGS ?= -enable-kvm -cpu host
 KERNEL_NAME ?= 6.1.0-18-amd64
 KERNEL ?= amd64/boot/vmlinuz-$(KERNEL_NAME)
 INITRD ?= amd64/boot/initrd.img-$(KERNEL_NAME)
 DISK ?= amd64/disk.ext4
-else ifeq ($(QEMU_ARCH),arm64)
+else ifeq ($(ARCH),arm64)
 QEMU_BIN=qemu-system-aarch64 -M virt -cpu cortex-a57  -append "root=/dev/vda console=ttyAMA0 noresume"
 KVM_ARGS ?=
 KERNEL_NAME ?= 6.1.0-18-arm64
@@ -16,7 +16,7 @@ KERNEL ?= arm64/boot/vmlinuz-$(KERNEL_NAME)
 INITRD ?= arm64/boot/initrd.img-$(KERNEL_NAME)
 DISK ?= arm64/disk.ext4
 else
-$(error "Unknown QEMU_ARCH: $(QEMU_ARCH)")
+$(error "Unknown ARCH: $(ARCH)")
 endif
 
 
@@ -38,28 +38,27 @@ qemu/start:
         -nographic
 
 
-SSH_CMD=ssh -p 2222 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@localhost
-#
-#wait_for_ssh() {
-#  local retries=0
-#  while ! (${connect} true); do
-#    if [[ "${retries}" -gt 30 ]]; then
-#      echo "SSH connection failed after 30 retries"
-#      exit 1
-#    fi
-#    retries=$((retries + 1))
-#    sleep 1
-#  done
-#}
+SSH_PORT ?= 2222
+SSH_OPTIONS ?= -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+SSH_CMD ?= ssh -p $(SSH_PORT) $(SSH_OPTIONS) root@localhost
 
-# TODO LOOP
 .PHONY: qemu/wait
 qemu/wait:
 	echo "Waiting for SSH to be available"
-	bash -c "local retries=0; while ! (${SSH_CMD} true); do if [[ \"\$$retries\" -gt 30 ]]; then echo \"SSH connection failed after 30 retries\"; exit 1; fi; retries=\$$((retries + 1)); sleep 1; done"
-#	${SSH_CMD} true
-#	echo "SSH is available"
+	for i in {1..30}; do \
+			$(SSH_CMD) true && break || sleep 1; \
+	done
+	$(SSH_CMD) true && echo "SSH is available"
+
+.PHONY: qemu/start_and_wait
+qemu/start_and_wait:
+	$(MAKE) qemu/start >/dev/null 2>/dev/null &
+	$(MAKE) qemu/wait
 
 .PHONY: qemu/ssh
 qemu/ssh:
 	$(SSH_CMD)
+
+.PHONY: qemu/scp
+qemu/scp:
+	scp -P $(SSH_PORT) $(SSH_OPTIONS) $(F) root@localhost:$(shell basename $(F))
