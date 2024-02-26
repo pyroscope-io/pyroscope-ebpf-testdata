@@ -44,11 +44,7 @@ SSH_CMD ?= ssh -p $(SSH_PORT) $(SSH_OPTIONS) root@localhost
 
 .PHONY: qemu/wait
 qemu/wait:
-	echo "Waiting for SSH to be available"
-	for i in {1..30}; do \
-			$(SSH_CMD) true && break || sleep 1; \
-	done
-	$(SSH_CMD) true && echo "SSH is available"
+	bash wait.sh
 
 .PHONY: qemu/start_and_wait
 qemu/start_and_wait:
