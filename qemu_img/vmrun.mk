@@ -55,9 +55,10 @@ SSH_CMD=ssh -p 2222 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no 
 # TODO LOOP
 .PHONY: qemu/wait
 qemu/wait:
-	@echo "Waiting for SSH to be available"
-	@${SSH_CMD} true
-	@echo "SSH is available"
+	echo "Waiting for SSH to be available"
+	bash -c "local retries=0; while ! (${SSH_CMD} true); do if [[ \"\$$retries\" -gt 30 ]]; then echo \"SSH connection failed after 30 retries\"; exit 1; fi; retries=\$$((retries + 1)); sleep 1; done"
+#	${SSH_CMD} true
+#	echo "SSH is available"
 
 .PHONY: qemu/ssh
 qemu/ssh:
