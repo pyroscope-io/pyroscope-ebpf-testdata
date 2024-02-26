@@ -61,4 +61,4 @@ qemu/scp:
 
 .PHONY: qemu/exec
 qemu/exec:
-	$(SSH_CMD) $(CMD)
+	$(SSH_CMD) $(F)
