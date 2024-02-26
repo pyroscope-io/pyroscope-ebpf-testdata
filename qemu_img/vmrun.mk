@@ -62,3 +62,7 @@ qemu/ssh:
 .PHONY: qemu/scp
 qemu/scp:
 	scp -P $(SSH_PORT) $(SSH_OPTIONS) $(F) root@localhost:$(shell basename $(F))
+
+.PHONY: qemu/exec
+qemu/exec:
+	$(SSH_CMD) $(CMD)
