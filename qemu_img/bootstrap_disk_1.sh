@@ -39,6 +39,16 @@ Name=ens* enp* eth*
 [Network]
 DHCP=yes
 DNS=8.8.8.8
+DNS=8.8.4.4
+EOF
+chmod 644 "$config_path"
+
+config_path="/etc/resolv.conf"
+cat > "$config_path" <<EOF
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+nameserver 192.168.0.1
+search TOTOLINK
 EOF
 chmod 644 "$config_path"
 
