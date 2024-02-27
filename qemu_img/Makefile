@@ -12,7 +12,7 @@ arm64/kernels:
 
 .PHONY: amd64/disk.ext4
 amd64/disk.ext4: amd64/kernels
-	rm -f $@ && fallocate -l 3G $@ && mkfs.ext4 $@
+	rm -f $@ && fallocate -l 5G $@ && mkfs.ext4 $@
 	docker build --platform=linux/amd64 --target=image_builder --tag=vm_image_builder -f amd64.Dockerfile .
 	# I failed to build a docker image using genext2fs, so I'm using a docker container to build the image using docker run --privileged
 	docker run --platform=linux/amd64 --rm -ti -u 0 --privileged -v $(shell pwd):/mnt/ vm_image_builder \
@@ -20,7 +20,7 @@ amd64/disk.ext4: amd64/kernels
 
 .PHONY: arm64/disk.ext4
 arm64/disk.ext4: arm64/kernels
-	rm -f $@ && fallocate -l 3G $@ && mkfs.ext4 $@
+	rm -f $@ && fallocate -l 5G $@ && mkfs.ext4 $@
 	docker build --platform=linux/arm64 --target=image_builder --tag=vm_image_builder -f arm64.Dockerfile .
 	# I failed to build a docker image using genext2fs, so I'm using a docker container to build the image using docker run --privileged
 	docker run --platform=linux/arm64 --rm -ti -u 0 --privileged -v $(shell pwd):/mnt/ vm_image_builder \
