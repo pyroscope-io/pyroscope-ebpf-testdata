@@ -36,8 +36,9 @@ dist/pull:
 	docker pull $(DIST_IMAGE)
 	docker rm temp_container || true
 	docker create --name temp_container $(DIST_IMAGE) sh
-	docker export temp_container | tar -xf - -C ./
+	docker export temp_container -o filesystem.tar
 	docker rm temp_container
+	tar -xf filesystem.tar -C ./
 	rm -rf filesystem.tar .dockerenv dev/ etc/
 
 
