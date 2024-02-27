@@ -1,0 +1,9 @@
+amdgpu.ko
+ast.ko
+bochs-drm.ko
+cirrus.ko
+hibmc-drm.ko
+mgag200.ko
+radeon.ko
+udl.ko
+virtio-gpu.ko
