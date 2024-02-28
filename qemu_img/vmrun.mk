@@ -35,7 +35,9 @@ qemu/start:
         -drive if=virtio,file=${DISK},format=raw,id=hd \
         -net user,hostfwd=tcp::2222-:22 \
         -net nic \
-        -nographic
+        -monitor telnet:127.0.0.1:2220,server,wait=off \
+        -serial telnet:127.0.0.1:2221,server,wait=off \
+        -display none
 
 
 SSH_PORT ?= 2222
@@ -48,7 +50,7 @@ qemu/wait:
 
 .PHONY: qemu/start_and_wait
 qemu/start_and_wait:
-	$(MAKE) qemu/start >/dev/null 2>/dev/null &
+	$(MAKE) qemu/start KVM_ARGS="$(KVM_ARGS) -daemonize"
 	$(MAKE) qemu/wait
 
 .PHONY: qemu/ssh
