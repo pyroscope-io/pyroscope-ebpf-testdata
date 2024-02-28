@@ -11,18 +11,17 @@ RUN apt-get update && apt-get -y install build-essential \
                         liblzma-dev       \
                         curl \
     git
-RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
-ENV PATH="/root/.asdf/bin:${PATH}"
-RUN asdf plugin-add python
+RUN git clone https://github.com/python/cpython.git
+
 # 3.13.0a3
 ARG PYTHON_VERSION_PATCH=???
 # 3.13
 ARG PYTHON_VERSION_MINOR=???
-RUN asdf install python ${PYTHON_VERSION_PATCH}
+RUN cd cpython && git fetch && git checkout v${PYTHON_VERSION_PATCH} && ./configure --enable-shared && make -j 32
 
 FROM scratch
 # 3.13.0a3
 ARG PYTHON_VERSION_PATCH=???
 # 3.13
 ARG PYTHON_VERSION_MINOR=???
-COPY --from=base /root/.asdf/installs/python/${PYTHON_VERSION_PATCH}/lib/libpython${PYTHON_VERSION_MINOR}.so.1.0 /libpython${PYTHON_VERSION_MINOR}.so.1.0
+COPY --from=base /cpython/libpython${PYTHON_VERSION_MINOR}.so.1.0 /libpython${PYTHON_VERSION_MINOR}.so.1.0
