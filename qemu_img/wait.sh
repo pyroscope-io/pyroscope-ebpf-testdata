@@ -18,3 +18,7 @@ wait_for_ssh() {
 }
 
 wait_for_ssh
+
+
+${connect} date -s "@$(date +%s)"
+${connect} date 
