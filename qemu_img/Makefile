@@ -1,5 +1,5 @@
-
-DIST_IMAGE ?= pyroscope/ebpf-test-vm-image:latest
+VERSION ?= v2
+DIST_IMAGE ?= pyroscope/ebpf-test-vm-image:$(VERSION)
 
 
 .PHONY: amd64/kernels
@@ -29,7 +29,7 @@ arm64/disk.ext4: arm64/kernels
 
 .PHONY: dist/push
 dist/push:
-	docker build --build-arg=IMAGE=$(DIST_IMAGE) --push -t $(DIST_IMAGE) -f dist.Dockerfile .
+	docker build --push -t $(DIST_IMAGE) -f dist.Dockerfile .
 
 .PHONY: dist/pull
 dist/pull:

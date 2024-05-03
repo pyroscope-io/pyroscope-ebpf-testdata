@@ -15,7 +15,7 @@ mount -o loop "$DISK" "$TMP"
 debootstrap bookworm "$TMP"
 
 cp /bootstrap_disk_1.sh  "$TMP/"
-fakechroot chroot "$TMP" bash /bootstrap_disk_1.sh
+chroot "$TMP" bash /bootstrap_disk_1.sh
 
 
 chroot "$TMP" update-alternatives --set iptables /usr/sbin/iptables-legacy

@@ -8,14 +8,14 @@ There are two architectures amd64 and arm64.
 3. Do some extra bootstrap (install packages on the disk ( bootstrap_disk_1.sh)
 4. Copy extracted modules and extra modules $ARCH/modules and $ARCH/modules_extra to disk
 
-You can commit extra kernels and modukes into boot_extra and modules_extra. _extra directories are not gitingored.
+You can commit extra kernels and modukes into boot_extra and modules_extra. _extra directories are not gitingored. They are copied into final image later in bootstrap_disk_0.sh.
 
 Here's an example how to pull them from aws for example
 
 rsync -avz -e "ssh  -i ~/Downloads/grafana-pyroscope-aws-sandbox.pem"  ec2-user@ec2-54-91-28-178.compute-1.amazonaws.com:/boot/ ./amd64/boot_extra
 rsync -avz -e "ssh  -i ~/Downloads/grafana-pyroscope-aws-sandbox.pem"  ec2-user@ec2-54-91-28-178.compute-1.amazonaws.com:/usr/lib/modules/ ./amd64/modules_extra
 
-This pulls a lot of modules and in theory we only need few of them (bridge, br_netfilter and its depdendcnies, but idk
+This pulls a lot of modules and in theory we only need few of them (bridge, br_netfilter and its dependencies, but idk
 how to find all the deps automatically so pulling all of them for now.
 
 You may need to update initramfs to be able to boot in qemu from virtio device
@@ -36,4 +36,4 @@ make qemu/start
 To rebuild docker image, do
 make amd64/disk.ext4
 make arm64/disk.ext4
-make dist/
+make dist/push
