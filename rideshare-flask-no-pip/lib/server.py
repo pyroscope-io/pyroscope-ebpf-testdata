@@ -25,6 +25,23 @@ def car():
     order_car(0.4)
     return "<p>Car ordered</p>"
 
+class CellClsIssueTypeType(type):
+    def __init__(cls, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __call__(cls, *args, **kwargs):
+        n = 239
+        for i in range(200000):
+            n = n + n
+
+class CellClsIssueType(metaclass=CellClsIssueTypeType):
+    pass
+
+@app.route("/cell_cls_issue")
+def cell_cls_issue():
+    a = CellClsIssueType()
+    return "<p>cell_cls_issue response</p>"
+
 
 @app.route("/")
 def environment():
