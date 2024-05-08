@@ -42,6 +42,22 @@ def cell_cls_issue():
     a = CellClsIssueType()
     return "<p>cell_cls_issue response</p>"
 
+class CellSelfIssue:
+  def __init__(self):
+    self.foo = 239
+  def bar(self):
+    def asd():
+      n = 239
+      for i in range(200000):
+        n = n + n
+      return self.foo
+    return asd()
+
+@app.route("/cell_self_issue")
+def cell_self_issue():
+    v = CellSelfIssue().bar()
+    return f"<p>cell_self_issue response{v}</p>"
+
 
 @app.route("/")
 def environment():
